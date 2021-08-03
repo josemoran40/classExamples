@@ -1,0 +1,59 @@
+
+/*Imports and define package*/
+package analyzers;
+import java_cup.runtime.*;
+
+
+parser code 
+{:
+	/*Method that is called when parser can be recovered*/
+	public void syntax_error(Symbol s){ 
+        System.out.println("Unexpected token: " +s.value); 
+    }
+
+	/*Method that is called when parser can't be recovered*/
+	public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.out.println("Fatal error, unexcepted token: "+s.value); 
+    } 
+:}
+
+
+terminal String PARLEFT,PARRIGHT;
+terminal String ADD,MINUS,TIMES,DIV;
+terminal String NUMBER;
+terminal String DECIMAL;
+terminal String UMINUS;
+
+non terminal ini;
+non terminal instruction;
+non terminal Double expression;
+
+
+precedence left ADD,MINUS;
+precedence left TIMES,DIV;
+precedence right UMINUS;
+
+start with ini; 
+
+ini ::=
+	  instruction:a {:System.out.println("Result: "+a); :}
+	| error 
+;
+
+
+instruction ::=
+	expression:res {:RESULT =  res;:} 
+;
+ 
+expression ::=
+	MINUS expression:left						{:RESULT = 0-left;:} %prec UMINUS
+	|expression:left ADD expression:right		{:RESULT = left+right;:}
+	|expression:left MINUS expression:right		{:RESULT = left-right;:}
+	|expression:left TIMES expression:right		{:RESULT = left*right;:}
+	|expression:left DIV expression:right		{:RESULT = left/right;:}
+	|PARLEFT expression:exp PARRIGHT			{:RESULT = exp;:}
+	|NUMBER:num									{:RESULT = new Double(num);:}
+	|DECIMAL:num								{:RESULT = new Double(num);:}
+;  
+
+ 
