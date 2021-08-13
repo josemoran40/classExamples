@@ -12,7 +12,6 @@ public class sym {
   public static final int cadena = 19;
   public static final int par2 = 7;
   public static final int par1 = 6;
-  public static final int decimal = 18;
   public static final int pr_mover = 9;
   public static final int pr_hacia = 12;
   public static final int pr_izquierda = 13;
@@ -22,12 +21,13 @@ public class sym {
   public static final int div = 4;
   public static final int EOF = 0;
   public static final int error = 1;
-  public static final int entero = 17;
+  public static final int pr_arriba = 16;
+  public static final int entero = 18;
   public static final int mas = 2;
   public static final int puntoycoma = 8;
   public static final int pr_derecha = 14;
   public static final int pr_abajo = 15;
-  public static final int pr_saludar = 16;
+  public static final int pr_saludar = 17;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -45,9 +45,9 @@ public class sym {
   "pr_izquierda",
   "pr_derecha",
   "pr_abajo",
+  "pr_arriba",
   "pr_saludar",
   "entero",
-  "decimal",
   "cadena"
   };
 }

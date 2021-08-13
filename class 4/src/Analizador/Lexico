@@ -19,13 +19,10 @@ import Errores.*;
 
 %init{ 
     yyline = 1; 
-    yychar = 1; 
+    yycolumn = 1; 
 %init} 
 
-LETRA =[a-zA-ZÑñ]+
 ENTERO =[0-9]+ 
-DECIMAL ={ENTERO} ("."? [0-9]*)?
-ID =({LETRA}|("_"{LETRA}))({LETRA}|{ENTERO}|"_")*
 CADENA =[\"\“\'] [^\"\”\'\n]* [\"\”\'\n]
 BLANCOS=[ \t\r\f\n]+
 %%
@@ -41,27 +38,24 @@ BLANCOS=[ \t\r\f\n]+
 ";" {return new Symbol(sym.puntoycoma,yycolumn,yyline,yytext());}
 
 
-"mover" {return new Symbol(sym.pr_mover,yyline,yychar, yytext());} 
-"a" {return new Symbol(sym.pr_a,yyline,yychar, yytext());} 
-"la" {return new Symbol(sym.pr_la,yyline,yychar, yytext());} 
-"hacia" {return new Symbol(sym.pr_hacia,yyline,yychar, yytext());} 
+"mover" {return new Symbol(sym.pr_mover,yyline,yycolumn, yytext());} 
+"a" {return new Symbol(sym.pr_a,yyline,yycolumn, yytext());} 
+"la" {return new Symbol(sym.pr_la,yyline,yycolumn, yytext());} 
+"hacia" {return new Symbol(sym.pr_hacia,yyline,yycolumn, yytext());} 
 
-"izquierda" {return new Symbol(sym.pr_izquierda,yyline,yychar, yytext());} 
-"derecha" {return new Symbol(sym.pr_derecha,yyline,yychar, yytext());} 
-"arriba" {return new Symbol(sym.pr_arriba,yyline,yychar, yytext());} 
-"abajo" {return new Symbol(sym.pr_abajo,yyline,yychar, yytext());} 
-"saludar" {return new Symbol(sym.pr_saludar,yyline,yychar, yytext());} 
-
-\n {yychar=1;}
+"izquierda" {return new Symbol(sym.pr_izquierda,yyline,yycolumn, yytext());} 
+"derecha" {return new Symbol(sym.pr_derecha,yyline,yycolumn, yytext());} 
+"arriba" {return new Symbol(sym.pr_arriba,yyline,yycolumn, yytext());} 
+"abajo" {return new Symbol(sym.pr_abajo,yyline,yycolumn, yytext());} 
+"saludar" {return new Symbol(sym.pr_saludar,yyline,yycolumn, yytext());} 
 
 {BLANCOS} {} 
-{ENTERO} {return new Symbol(sym.entero,yyline,yychar, yytext());} 
-{DECIMAL} {return new Symbol(sym.decimal,yyline,yychar, yytext());} 
-{CADENA} {return new Symbol(sym.cadena,yyline,yychar, yytext());} 
+{ENTERO} {return new Symbol(sym.entero,yyline,yycolumn, yytext());} 
+{CADENA} {return new Symbol(sym.cadena,yyline,yycolumn, yytext());} 
 
 . {
     System.out.println("Este es un error lexico: "+yytext()+
-    ", en la linea: "+yyline+", en la columna: "+yychar);
+    ", en la linea: "+yyline+", en la columna: "+yycolumn);
 AnalizadorLenguaje.errores.add(new MiError(yyline, yycolumn, TipoError.LEXICO, 
             "Se detectó un error léxico (caracter "+yytext()+")"));
 }
