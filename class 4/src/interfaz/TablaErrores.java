@@ -5,7 +5,7 @@
  */
 package interfaz;
 
-import AST.Errores.MiError;
+import Errores.MiError;
 import java.awt.Dimension;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

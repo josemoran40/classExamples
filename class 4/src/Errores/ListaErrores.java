@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package AST.Errores;
+package Errores;
 
 import interfaz.Principal;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@
 
 package Analizador;
 import java_cup.runtime.Symbol;
-import AST.Errores.*;
+import Errores.*;
 
 
 %% 
@@ -30,8 +30,6 @@ CADENA =[\"\“\'] [^\"\”\'\n]* [\"\”\'\n]
 BLANCOS=[ \t\r\f\n]+
 %%
 
-
-
 "+" {return new Symbol(sym.mas,yycolumn,yyline,yytext());}
 "-" {return new Symbol(sym.menos,yycolumn,yyline,yytext());}
 "*" {return new Symbol(sym.por,yycolumn,yyline,yytext());}
@@ -40,28 +38,19 @@ BLANCOS=[ \t\r\f\n]+
 "(" {return new Symbol(sym.par1,yycolumn,yyline,yytext());}
 ")" {return new Symbol(sym.par2,yycolumn,yyline,yytext());}
 
-"<" {return new Symbol(sym.menor,yycolumn,yyline,yytext());}
-">" {return new Symbol(sym.mayor,yycolumn,yyline,yytext());}
-"=" {return new Symbol(sym.igual,yycolumn,yyline,yytext());}
-"!" {return new Symbol(sym.not,yycolumn,yyline,yytext());}
-
 ";" {return new Symbol(sym.puntoycoma,yycolumn,yyline,yytext());}
 
-"{" {return new Symbol(sym.llave1,yycolumn,yyline,yytext());}
-"}" {return new Symbol(sym.llave2,yycolumn,yyline,yytext());}
 
-"," {return new Symbol(sym.coma,yycolumn,yyline,yytext());}
+"mover" {return new Symbol(sym.pr_mover,yyline,yychar, yytext());} 
+"a" {return new Symbol(sym.pr_a,yyline,yychar, yytext());} 
+"la" {return new Symbol(sym.pr_la,yyline,yychar, yytext());} 
+"hacia" {return new Symbol(sym.pr_hacia,yyline,yychar, yytext());} 
 
-
-"number" {return new Symbol(sym.pr_number,yyline,yychar, yytext());} 
-"boolean" {return new Symbol(sym.pr_boolean,yyline,yychar, yytext());} 
-"string" {return new Symbol(sym.pr_string,yyline,yychar, yytext());} 
-
-"if" {return new Symbol(sym.pr_if,yyline,yychar, yytext());} 
-"else" {return new Symbol(sym.pr_else,yyline,yychar, yytext());} 
-"for" {return new Symbol(sym.pr_for,yyline,yychar, yytext());} 
-"while" {return new Symbol(sym.pr_while,yyline,yychar, yytext());} 
-"func" {return new Symbol(sym.pr_func,yyline,yychar, yytext());} 
+"izquierda" {return new Symbol(sym.pr_izquierda,yyline,yychar, yytext());} 
+"derecha" {return new Symbol(sym.pr_derecha,yyline,yychar, yytext());} 
+"arriba" {return new Symbol(sym.pr_arriba,yyline,yychar, yytext());} 
+"abajo" {return new Symbol(sym.pr_abajo,yyline,yychar, yytext());} 
+"saludar" {return new Symbol(sym.pr_saludar,yyline,yychar, yytext());} 
 
 \n {yychar=1;}
 
@@ -69,7 +58,6 @@ BLANCOS=[ \t\r\f\n]+
 {ENTERO} {return new Symbol(sym.entero,yyline,yychar, yytext());} 
 {DECIMAL} {return new Symbol(sym.decimal,yyline,yychar, yytext());} 
 {CADENA} {return new Symbol(sym.cadena,yyline,yychar, yytext());} 
-{ID} {return new Symbol(sym.identificador,yycolumn,yyline,yytext());}
 
 . {
     System.out.println("Este es un error lexico: "+yytext()+

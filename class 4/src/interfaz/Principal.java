@@ -5,7 +5,7 @@
  */
 package interfaz;
 
-import AST.Errores.MiError;
+import Errores.MiError;
 import Analizador.AnalizadorLenguaje;
 import java.awt.Color;
 import java.awt.Dimension;

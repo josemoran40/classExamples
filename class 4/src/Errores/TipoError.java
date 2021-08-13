@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package AST.Simbolos;
+package Errores;
 
 /**
  *
  * @author gm_ye
  */
-public enum TipoDatoSimbolo {
-    CADENA,
-    NUMERO,
-    ID,
-    BOOLEANO
+public enum TipoError {
+    LEXICO,SINTACTICO, SEMANTICO
 }

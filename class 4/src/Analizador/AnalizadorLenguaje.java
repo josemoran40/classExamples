@@ -5,13 +5,9 @@
  */
 package Analizador;
 
-import AST.Errores.ListaErrores;
-import AST.Metodo;
-import AST.Sentencias.Sentencia;
-import AST.Simbolos.TablaSimbolos;
+import Errores.ListaErrores;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.ArrayList;
 
 /**
  *
@@ -20,9 +16,7 @@ import java.util.ArrayList;
 public class AnalizadorLenguaje {
 
     private static AnalizadorLenguaje analizador;
-    public static ArrayList<Sentencia> sentencias;
     public static ListaErrores errores;
-    public static ArrayList<Metodo> listaMetodos;
 
     public static boolean AnalizarCodigo(String entrada, String ubicacion) {
         try {
@@ -30,22 +24,6 @@ public class AnalizadorLenguaje {
                     new Lexico(new BufferedReader(new StringReader(entrada))));
             //analizando
             sin.parse();
-            if (AnalizadorLenguaje.listaMetodos != null) {
-
-                for (Metodo t : listaMetodos) {
-                    if ("main".equals(t.getNombre())) {
-                        int i;
-                        TablaSimbolos global = new TablaSimbolos(null);
-                        for (i = 0; i < t.getSentencias().size(); i++) {
-                            t.getSentencias().get(i).Ejecutar(global);
-                        }
-                        break;
-                    }
-                }
-                System.out.println("Sin errores");
-            } else {
-                throw new Exception("No hay sentencias reconocidas");
-            }
         } catch (Exception ex) {
             System.err.println("Error: " + ex.getMessage());
         }
@@ -64,22 +42,7 @@ public class AnalizadorLenguaje {
                     new Lexico(new BufferedReader(new StringReader(entrada))));
             //analizando
             sin.parse();
-            if (AnalizadorLenguaje.listaMetodos != null) {
-                for (Metodo t : listaMetodos) {
-                    if ("main".equals(t.getNombre())) {
-                         graph.append(t.hashCode()).append("[label=\"main\"];\n");
-                         int i;
-                    for (i = 0; i < t.getSentencias().size(); i++) {
-                        t.getSentencias().get(i).getCodigoGraph(graph);
-                        graph.append(t.hashCode()).append("->").append(t.getSentencias().get(i).hashCode()).append(";\n");
-         }
-                        break;
-                    }
-                }
-                System.out.println("Sin errores");
-            } else {
-                throw new Exception("No hay sentencias reconocidas");
-            }
+            
         } catch (Exception ex) {
             System.err.println("Error: " + ex.getMessage());
         }
@@ -91,7 +54,6 @@ public class AnalizadorLenguaje {
         if (analizador == null) {
             analizador = new AnalizadorLenguaje();
             errores = new ListaErrores();
-            listaMetodos = new ArrayList<>();
         }
         return analizador;
     }
@@ -99,7 +61,6 @@ public class AnalizadorLenguaje {
     public static void LimpiarInstancia() {
         if (analizador != null) {
             errores.clear();
-            listaMetodos.clear();
         } else {
             System.out.println("No existe un analizador");
         }
