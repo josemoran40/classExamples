@@ -1,0 +1,193 @@
+/*
+ * Organización de Lenguajes y Compiladores 1 A
+ * Aux. Emely García
+ */
+
+package Analizador;
+import AST.Errores.MiError;
+import AST.Errores.TipoError;
+import AST.Expresiones.Condicion;
+import AST.Expresiones.Expresion;
+import AST.Expresiones.OperacionAritmeticas;
+import AST.Expresiones.TipoCondicion;
+import AST.Expresiones.TipoOperacion;
+import AST.Metodo;
+import AST.Sentencias.Asignacion;
+import AST.Sentencias.Declaracion;
+import AST.Sentencias.For;
+import AST.Sentencias.If;
+import AST.Sentencias.Incremento;
+import AST.Sentencias.LlamadaMetodo;
+import AST.Sentencias.Sentencia;
+import AST.Sentencias.While;
+import AST.Simbolos.TipoDatoSimbolo;
+import java_cup.runtime.*;
+import java.util.ArrayList;
+
+parser code  
+{:
+    /**
+     * Método al que se llama automáticamente ante algún error sintactico.
+     **/ 
+    public void syntax_error(Symbol s){ 
+        System.out.println("Error Sintáctico en la Línea " + (s.left) +
+        " Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+        AnalizadorLenguaje.errores.add(new MiError(s.left, s.right, TipoError.SINTACTICO, 
+                "Se detectó un error sintáctico ("+s.value+")"));
+        
+    } 
+
+    /**
+     * Método al que se llama automáticamente ante algún error sintáctico 
+     * en el que ya no es posible una recuperación de errores.
+     **/ 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.out.println("Error síntactico irrecuperable en la Línea " + 
+        (s.left)+ " Columna "+s.right+". Componente " + s.value + 
+        " no reconocido."); 
+        AnalizadorLenguaje.errores.add(new MiError(s.left, s.right, TipoError.SINTACTICO, 
+                        "Se detectó un error sintáctico ("+s.value+")"));
+    }  
+:} 
+terminal mas,menos,div,por;
+terminal par1,par2;
+terminal mayor,menor,igual,not;
+terminal puntoycoma,llave1,llave2,coma;
+
+terminal String pr_if,pr_else, pr_for, pr_while, pr_number, pr_boolean, pr_string, pr_func;
+terminal String entero,decimal,cadena,identificador;
+non terminal INICIO;
+non terminal Expresion EXPRESION,VALOR;
+non terminal Condicion CONDICION;
+non terminal Sentencia SENTENCIA,DECLARACION,ASIGNACION,LLAMADAMF,IFELSE;
+non terminal LISTAPARAMS;
+non terminal SENTENCIACC;
+non terminal TipoDatoSimbolo TIPODATO;
+non terminal Sentencia FOR, WHILE, INCREMENTO;
+non terminal Metodo FUNCION;
+non terminal ArrayList<Metodo> LISTAFUNC;
+
+non terminal ArrayList<Sentencia> BLOQUESENTENCIAS,SENTENCIAS;
+
+//precedencia
+precedence left mayor,menor,igual;
+precedence right not;
+precedence left mas,menos;
+precedence left por,div;
+
+
+start with INICIO;
+
+INICIO ::= LISTAFUNC:lista {:
+    AnalizadorLenguaje.listaMetodos = lista;
+:};
+
+LISTAFUNC::= LISTAFUNC:l FUNCION:a {:
+ArrayList<Metodo> lista =  l;
+lista.add((Metodo)a); 
+RESULT = lista;
+:}
+| FUNCION:a {: 
+ArrayList<Metodo> lista = new ArrayList<>();
+lista.add((Metodo)a); 
+RESULT = lista;
+:};
+
+
+FUNCION::= pr_func identificador:a par1 par2 BLOQUESENTENCIAS:b {: RESULT = new Metodo(a,b);:};
+
+SENTENCIAS ::= SENTENCIAS:sent SENTENCIA:b puntoycoma {:
+ArrayList<Sentencia> lista =  sent;
+lista.add((Sentencia)b); 
+RESULT = lista;
+:}
+|SENTENCIA:a puntoycoma {: 
+ArrayList<Sentencia> lista = new ArrayList();
+lista.add((Sentencia)a); 
+RESULT = lista;
+:}
+| SENTENCIAS:sent SENTENCIACC:b {:
+ArrayList<Sentencia> lista =  sent;
+lista.add((Sentencia)b); 
+RESULT = lista;
+:}
+| SENTENCIACC:a {: 
+ArrayList<Sentencia> lista = new ArrayList();
+lista.add((Sentencia)a); 
+RESULT = lista;
+:}
+;
+
+SENTENCIA ::= DECLARACION :a {: RESULT = a; :}
+    | ASIGNACION:a {: RESULT = a; :}
+    | LLAMADAMF:a {: RESULT = a; :}
+;
+
+SENTENCIACC::=  IFELSE:a {: RESULT = a; :}
+|FOR:a {: RESULT = a; :}
+|WHILE:a {: RESULT = a; :};
+
+BLOQUESENTENCIAS::= llave1 SENTENCIAS:a llave2 {: RESULT = a; :}
+    |llave1  llave2{: RESULT = new ArrayList<>(); :};
+
+FOR::=pr_for:z par1 ASIGNACION:a puntoycoma CONDICION:b puntoycoma INCREMENTO:c par2 BLOQUESENTENCIAS:d{:
+RESULT = new For(a,b,c,d,zleft,zright);
+:}; 
+
+INCREMENTO::= identificador:a mas mas {:RESULT = new Incremento(a,aleft,aright);:};
+
+WHILE::= pr_while:z par1 CONDICION:a par2 BLOQUESENTENCIAS:b {:
+RESULT = new While(a,b,zleft,zright);
+:};
+
+IFELSE::= pr_if par1 CONDICION:a par2 BLOQUESENTENCIAS:b {:RESULT = new If(a,b,aleft, aright); :}
+    |pr_if par1 CONDICION:a par2 BLOQUESENTENCIAS:b pr_else BLOQUESENTENCIAS:c 
+    {:RESULT = new If(a,b,c, aleft, aright); :};
+
+LLAMADAMF::= identificador:nombre par1 LISTAPARAMS:array par2 {: 
+            RESULT = new LlamadaMetodo((ArrayList<Expresion>) array,(String) nombre, nombreleft, nombreright);:};
+
+LISTAPARAMS::= LISTAPARAMS:params coma EXPRESION:b {: 
+ArrayList<Expresion> lista = (ArrayList<Expresion>) params;
+lista.add(b); 
+RESULT = lista;
+:}
+|EXPRESION:a 
+{: 
+ArrayList<Expresion> lista = new ArrayList();
+lista.add(a); 
+RESULT = lista;
+:}
+| {: RESULT = new ArrayList(); :};
+
+
+
+ASIGNACION ::= identificador:a igual EXPRESION:b {:
+RESULT = new Asignacion(a,b,aleft,aright);
+:}; 
+
+DECLARACION ::= TIPODATO:tipo identificador:nombre 
+{:  RESULT = new Declaracion(tipo, nombre, tipoleft, tipoleft); :};
+
+TIPODATO ::= pr_number {: RESULT = TipoDatoSimbolo.NUMERO; :}
+    | pr_string {: RESULT = TipoDatoSimbolo.CADENA; :}
+    | pr_boolean {: RESULT = TipoDatoSimbolo.BOOLEANO; :};
+
+EXPRESION::=EXPRESION:a mas:c EXPRESION:b {: RESULT = new OperacionAritmeticas(a,b,TipoOperacion.SUMA,aleft,aright); :}
+    |EXPRESION:a menos:c EXPRESION:b {: RESULT = new OperacionAritmeticas(a,b,TipoOperacion.RESTA,aleft,aright); :}
+    |EXPRESION:a div:c EXPRESION:b {: RESULT = new OperacionAritmeticas(a,b,TipoOperacion.DIVISION,aleft,aright); :}
+    |EXPRESION:a por:c EXPRESION:b {: RESULT = new OperacionAritmeticas(a,b,TipoOperacion.MULTIPLICACION,aleft,aright); :}
+    |VALOR:a {: RESULT = a; :} 
+    |CONDICION :a {: RESULT = a; :} ;
+
+CONDICION::= EXPRESION:a mayor:c EXPRESION:b {: RESULT =  new Condicion(a,b,TipoCondicion.MAYOR,cleft,cright);:}
+    |EXPRESION:a menor:c EXPRESION:b {:RESULT =  new Condicion(a,b,TipoCondicion.MENOR,cleft,cright);:}
+    |EXPRESION:a igual:c igual EXPRESION:b {:RESULT =  new Condicion(a,b,TipoCondicion.IGUAL,cleft,cright);:}
+    |EXPRESION:a not:c igual EXPRESION:b {:RESULT =  new Condicion(a,b,TipoCondicion.DIFERENTE,cleft,cright);:}
+    ;
+
+
+VALOR ::= cadena:a {: RESULT = new OperacionAritmeticas(TipoOperacion.CADENA,(String)a,aleft,aright); :}
+    |entero:a {: RESULT = new OperacionAritmeticas(TipoOperacion.NUMERO,(String)a,aleft,aright); :}
+    |decimal:a {: RESULT = new OperacionAritmeticas(TipoOperacion.NUMERO,(String)a,aleft,aright); :}
+    |identificador:a {: RESULT = new OperacionAritmeticas(TipoOperacion.ID,(String)a,aleft,aright); :};

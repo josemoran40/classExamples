@@ -1,0 +1,79 @@
+/*
+ * Organización de Lenguajes y Compiladores 1 A
+ * Aux. Emely García
+ */
+
+package Analizador;
+import java_cup.runtime.Symbol;
+import AST.Errores.*;
+
+
+%% 
+%class Lexico
+%public 
+%line 
+%char 
+%cup 
+%unicode
+%ignorecase
+
+%init{ 
+    yyline = 1; 
+    yychar = 1; 
+%init} 
+
+LETRA =[a-zA-ZÑñ]+
+ENTERO =[0-9]+ 
+DECIMAL ={ENTERO} ("."? [0-9]*)?
+ID =({LETRA}|("_"{LETRA}))({LETRA}|{ENTERO}|"_")*
+CADENA =[\"\“\'] [^\"\”\'\n]* [\"\”\'\n]
+BLANCOS=[ \t\r\f\n]+
+%%
+
+
+
+"+" {return new Symbol(sym.mas,yycolumn,yyline,yytext());}
+"-" {return new Symbol(sym.menos,yycolumn,yyline,yytext());}
+"*" {return new Symbol(sym.por,yycolumn,yyline,yytext());}
+"/" {return new Symbol(sym.div,yycolumn,yyline,yytext());}
+
+"(" {return new Symbol(sym.par1,yycolumn,yyline,yytext());}
+")" {return new Symbol(sym.par2,yycolumn,yyline,yytext());}
+
+"<" {return new Symbol(sym.menor,yycolumn,yyline,yytext());}
+">" {return new Symbol(sym.mayor,yycolumn,yyline,yytext());}
+"=" {return new Symbol(sym.igual,yycolumn,yyline,yytext());}
+"!" {return new Symbol(sym.not,yycolumn,yyline,yytext());}
+
+";" {return new Symbol(sym.puntoycoma,yycolumn,yyline,yytext());}
+
+"{" {return new Symbol(sym.llave1,yycolumn,yyline,yytext());}
+"}" {return new Symbol(sym.llave2,yycolumn,yyline,yytext());}
+
+"," {return new Symbol(sym.coma,yycolumn,yyline,yytext());}
+
+
+"number" {return new Symbol(sym.pr_number,yyline,yychar, yytext());} 
+"boolean" {return new Symbol(sym.pr_boolean,yyline,yychar, yytext());} 
+"string" {return new Symbol(sym.pr_string,yyline,yychar, yytext());} 
+
+"if" {return new Symbol(sym.pr_if,yyline,yychar, yytext());} 
+"else" {return new Symbol(sym.pr_else,yyline,yychar, yytext());} 
+"for" {return new Symbol(sym.pr_for,yyline,yychar, yytext());} 
+"while" {return new Symbol(sym.pr_while,yyline,yychar, yytext());} 
+"func" {return new Symbol(sym.pr_func,yyline,yychar, yytext());} 
+
+\n {yychar=1;}
+
+{BLANCOS} {} 
+{ENTERO} {return new Symbol(sym.entero,yyline,yychar, yytext());} 
+{DECIMAL} {return new Symbol(sym.decimal,yyline,yychar, yytext());} 
+{CADENA} {return new Symbol(sym.cadena,yyline,yychar, yytext());} 
+{ID} {return new Symbol(sym.identificador,yycolumn,yyline,yytext());}
+
+. {
+    System.out.println("Este es un error lexico: "+yytext()+
+    ", en la linea: "+yyline+", en la columna: "+yychar);
+AnalizadorLenguaje.errores.add(new MiError(yyline, yycolumn, TipoError.LEXICO, 
+            "Se detectó un error léxico (caracter "+yytext()+")"));
+}
