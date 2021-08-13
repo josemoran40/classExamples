@@ -5,6 +5,8 @@
  */
 package Acciones;
 
+import interfaz.Principal;
+
 /**
  *
  * @author devemg
@@ -25,7 +27,26 @@ public class Accion {
     }
     
     public void hacer() {
-        System.out.println("Mover "+ this.valor);
+        String message = this.getMessage();
+        System.out.println(message);
+        Principal.escribirMensajeEnConsola(message);
+    }
+    
+    private String getMessage() {
+        switch(this.movimiento) {
+            case ABAJO:
+                return "Moviendome "+this.valor+" hacia abajo";
+            case ARRIBA:
+                return "Moviendome "+this.valor+" hacia arriba";
+            case DERECHA:
+                return "Moviendome "+this.valor+" hacia la derecha";
+            case IZQUIERDA:
+                return "Moviendome "+this.valor+" hacia la izquierda";
+            case SALUDAR:
+                return "Tengo un mensaje: "+this.cadena;
+            default:
+                return "";
+        }
     }
     
 }

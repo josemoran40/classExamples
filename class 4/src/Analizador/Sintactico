@@ -73,7 +73,7 @@ RESULT.add(val);
 :};
 
 INSTRUCCION ::= pr_mover EXPRESION:val MOVIMIENTO:mov puntoycoma {: RESULT = new Accion(mov,val); :}
-|pr_saludar cadena:val {: RESULT = new Accion(Movimiento.SALUDAR,val); :}
+|pr_saludar cadena:val puntoycoma {: RESULT = new Accion(Movimiento.SALUDAR,val); :}
 | error puntoycoma;
 
 MOVIMIENTO ::= pr_a pr_la pr_izquierda {: RESULT = Movimiento.IZQUIERDA; :}
@@ -87,5 +87,6 @@ EXPRESION ::= EXPRESION:a mas EXPRESION:b {: RESULT = a+b; :}
 |EXPRESION:a menos EXPRESION:b {: RESULT = a-b; :} 
 |EXPRESION:a por EXPRESION:b {: RESULT = a*b; :}
 |EXPRESION:a div EXPRESION:b {: RESULT = a/b; :}
+|par1 EXPRESION:a par2 {: RESULT = a; :}
 |entero:num {: RESULT = new Double(num); :}
 ;
