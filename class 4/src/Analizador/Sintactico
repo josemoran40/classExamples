@@ -1,0 +1,92 @@
+/*
+ * Organización de Lenguajes y Compiladores 1 A
+ * Aux. Emely García
+ */
+
+package Analizador;
+import Errores.MiError;
+import Errores.TipoError;
+import Acciones.Movimiento;
+import Acciones.Accion; 
+
+import java_cup.runtime.*;
+import java.util.ArrayList;
+
+parser code  
+{:
+    /**
+     * Método al que se llama automáticamente ante algún error sintactico.
+     **/ 
+    public void syntax_error(Symbol s){ 
+        System.out.println("Error Sintáctico en la Línea " + (s.left) +
+        " Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+        AnalizadorLenguaje.errores.add(new MiError(s.left, s.right, TipoError.SINTACTICO, 
+                "Se detectó un error sintáctico ("+s.value+")"));
+        
+    } 
+
+    /**
+     * Método al que se llama automáticamente ante algún error sintáctico 
+     * en el que ya no es posible una recuperación de errores.
+     **/ 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.out.println("Error síntactico irrecuperable en la Línea " + 
+        (s.left)+ " Columna "+s.right+". Componente " + s.value + 
+        " no reconocido."); 
+        AnalizadorLenguaje.errores.add(new MiError(s.left, s.right, TipoError.SINTACTICO, 
+                        "Se detectó un error sintáctico ("+s.value+")"));
+    }  
+:} 
+terminal mas,menos,div,por;
+terminal par1,par2, puntoycoma;
+
+terminal String pr_mover, pr_a, pr_la, pr_hacia;
+terminal pr_izquierda, pr_derecha, pr_abajo, pr_arriba, pr_saludar;
+terminal String entero,cadena;
+
+non terminal INICIO;
+non terminal ArrayList<Accion> INSTRUCCIONES;
+non terminal Accion INSTRUCCION;
+non terminal Movimiento MOVIMIENTO;
+non terminal Double EXPRESION;
+
+//precedencia
+precedence left mas,menos;
+precedence left por,div;
+
+
+start with INICIO;
+
+INICIO ::= INSTRUCCIONES:lista {:
+lista.forEach((t) -> {
+    t.hacer();
+    });
+:};
+
+INSTRUCCIONES ::= INSTRUCCIONES:lista INSTRUCCION:val {:
+RESULT = lista;
+RESULT.add(val);
+:}
+| INSTRUCCION:val {:
+RESULT = new ArrayList<>();
+RESULT.add(val);
+:};
+
+INSTRUCCION ::= pr_mover EXPRESION:val MOVIMIENTO:mov puntoycoma {: RESULT = new Accion(mov,val); :}
+|pr_saludar cadena:val puntoycoma {: RESULT = new Accion(Movimiento.SALUDAR,val); :}
+| error puntoycoma;
+
+MOVIMIENTO ::= pr_a pr_la pr_izquierda {: RESULT = Movimiento.IZQUIERDA; :}
+|pr_a pr_la pr_derecha {: RESULT = Movimiento.DERECHA; :}
+|pr_hacia pr_arriba {: RESULT = Movimiento.ARRIBA; :}
+|pr_hacia pr_abajo {: RESULT = Movimiento.ABAJO; :}
+;
+
+
+EXPRESION ::= EXPRESION:a mas EXPRESION:b {: RESULT = a+b; :}
+|EXPRESION:a menos EXPRESION:b {: RESULT = a-b; :} 
+|EXPRESION:a por EXPRESION:b {: RESULT = a*b; :}
+|EXPRESION:a div EXPRESION:b {: RESULT = a/b; :}
+|par1 EXPRESION:a par2 {: RESULT = a; :}
+|entero:num {: RESULT = new Double(num); :}
+;
