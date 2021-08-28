@@ -1,0 +1,70 @@
+
+/*Imports and define package*/
+package Analizadores;
+import java_cup.runtime.*;
+
+parser code 
+{:
+	/*Method that is called when parser can be recovered*/
+	public void syntax_error(Symbol s){ 
+        System.out.println("Unexpected token: " +s.value); 
+    }
+
+	/*Method that is called when parser can't be recovered*/
+	public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.out.println("Unexpected token: " +s.value); 
+    } 
+:}
+
+
+terminal String PARLEFT,PARRIGHT;
+terminal String PUNTOYCOMA;
+terminal String LEFT, RIGHT;
+terminal String FUNCTION, PARAMEMTRO;
+
+non terminal ini;
+non terminal instructions;
+non terminal instruction;
+non terminal parametros;
+non terminal p;
+
+
+start with ini; 
+
+ini ::=
+	  instructions {:System.out.println("analisis");:}
+;
+
+/*
+	Gramatica a reconocer
+	function (param, param, param){
+	
+	}
+	function (param, param, param){
+	
+	}
+	function (param){
+	}
+
+	function (){
+	
+	}
+*/
+
+instructions::= instructions instruction 
+|instruction 
+;
+
+instruction ::=
+		FUNCTION  p LEFT RIGHT PUNTOYCOMA
+;
+
+p ::= PARLEFT  parametros PARRIGHT 
+| PARLEFT PARRIGHT 
+;
+
+
+parametros::=parametros PARAMEMTRO
+|PARAMEMTRO 
+;
+ 

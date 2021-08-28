@@ -6,8 +6,9 @@
 /*Imports and define package*/
 package analyzers;
 import Error.*;
+import Instructions.*;
 import java_cup.runtime.Symbol; 
-import Instruccions.*;
+
 
 // See https://github.com/jflex-de/jflex/issues/222
 @SuppressWarnings("FallThrough")
@@ -701,7 +702,7 @@ public class Scanner implements java_cup.runtime.Scanner {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
             { //System.out.println("Lexical error: "+yytext());
-	Instruction.lista.addError(new Error_("Lexical error: "+yytext(), "Lexico"));
+	Instruction.lista.add(new Error_("Error lexico: "+yytext(),"Lexico"));
             }
             // fall through
           case 12: break;

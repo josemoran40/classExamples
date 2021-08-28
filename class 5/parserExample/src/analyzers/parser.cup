@@ -4,19 +4,20 @@ package analyzers;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import Error.*;
-import Instruccions.*;
+import Instructions.*;
 
 parser code 
 {:
 	/*Method that is called when parser can be recovered*/
 	public void syntax_error(Symbol s){ 
-        System.out.println("Unexpected token: " +s.value); 
-		Instruction.lista.addError(new Error_("Sintactico error: "+s.value, "Sintactico"));
+        //System.out.println("Unexpected token: " +s.value); 
+		Instruction.lista.add(new Error_("Error Sintactico: "+s.value,"Sintactico"));
     }
 
 	/*Method that is called when parser can't be recovered*/
 	public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
-		Instruction.lista.addError(new Error_("Sintactico error: "+s.value, "Sintactico"));
+        //System.out.println("Fatal error, unexcepted token: "+s.value); 
+		Instruction.lista.add(new Error_("Error Sintactico: "+s.value,"Sintactico"));
     } 
 :}
 
@@ -29,9 +30,9 @@ terminal String UMINUS;
 terminal String PUNTOYCOMA;
 
 non terminal ini;
-non terminal ArrayList<String> instructions;
 non terminal instruction;
 non terminal Double expression;
+non terminal ArrayList<String> instructions;
 
 
 precedence left ADD,MINUS;
@@ -40,22 +41,18 @@ precedence right UMINUS;
 
 start with ini; 
 
-ini ::=
-	  instructions:a {: 
-		a.forEach((t) -> {
-    System.out.println(t);
-    });
- :}
+ini ::= instructions:a {:
+	a.forEach((t)->{
+		System.out.println(t);
+	});
+:};
+
+instructions ::= instructions:list instruction:a {:RESULT=list;  RESULT.add(new String(a.toString())); :}
+	| instruction:a {:RESULT = new ArrayList<String>(); RESULT.add(new String(a.toString())); :}
 ;
 
-instructions::= instructions:list instruction:val {:RESULT = list;
-												RESULT.add( new String(val.toString()));:}
-		
-		|instruction:val{:RESULT = new ArrayList<String>();
-						RESULT.add( new String(val.toString()));
-						:};
 instruction ::=
-	expression:res PUNTOYCOMA  {:RESULT =  res;:}
+	expression:res PUNTOYCOMA {:RESULT =  res;:} 
 	| error PUNTOYCOMA
 ;
  
