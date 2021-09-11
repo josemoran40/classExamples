@@ -1,9 +1,9 @@
 
+
+
 /*Imports and define package*/
-package analyzers;
-import Error.*;
+package Analizadores;
 import java_cup.runtime.Symbol; 
-import Instruccions.*;
 %%
 
 /*Define how will works our scanner*/
@@ -25,33 +25,33 @@ import Instruccions.*;
 
 /*Section or regular expressions*/
 WHITE = [ \r\t]+
-NUMBER = [0-9]+
-DECIMAL = [0-9]+("."[0-9]+)?
 
 %%
 
 /*
 	Sym.* will be the name of the token
 	yytext() is the actual value
+
+
+	function (param, param, param){
+	
+	}
 */
 
 "(" {return new Symbol(sym.PARLEFT, yytext());} 
 ")" {return new Symbol(sym.PARRIGHT, yytext());} 
-
-"+" {return new Symbol(sym.ADD, yytext());} 
-"-" {return new Symbol(sym.MINUS, yytext());} 
-"*" {return new Symbol(sym.TIMES, yytext());} 
-"/" {return new Symbol(sym.DIV, yytext());} 
 ";" {return new Symbol(sym.PUNTOYCOMA, yytext());} 
+"{" {return new Symbol(sym.LEFT, yytext());} 
+"}" {return new Symbol(sym.RIGHT, yytext());} 
+
+"function" {return new Symbol(sym.FUNCTION, yytext());} 
+"param" {return new Symbol(sym.PARAMETRO, yytext());} 
 
 \*Ignore white spaces*\
 {WHITE} {}
 
-{NUMBER} {return new Symbol(sym.NUMBER, yytext());} 
-{DECIMAL} {return new Symbol(sym.DECIMAL, yytext());} 
 
 . {
-    //System.out.println("Lexical error: "+yytext());
-	Instruction.lista.addError(new Error_("Lexical error: "+yytext(), "Lexico"));
+    System.out.println("Lexical error: "+yytext());
 
 }

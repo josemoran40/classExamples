@@ -5,7 +5,7 @@
  */
 package parserexample;
 
-import Instruccions.Instruction;
+import Instructions.Instruction;
 import analyzers.Scanner;
 import analyzers.Parser;
 import java.io.BufferedReader;
@@ -22,13 +22,22 @@ public class ParserExample {
 	 */
 	public static void main(String[] args) {
 		String texto =  "5*565+64.5+(-5);"
-				+ "5*565+64.5+(-5);;"
+				+ "5*565+64.5+(-5@);"
 				+ "5*565+64.5+(-5);"
 				+ "6+6+6;";
-		Instruction ins = Instruction.getInstancia();
+		
+		Instruction ins = Instruction.getInstacia();
+		
 		ins.analize(texto);
+		
 		for (int i = 0; i < ins.lista.size(); i++) {
-			System.out.print(ins.lista.get(i).getMessage());
+			System.err.println("MENSAJE: "+ins.lista.get(i).getMessage()+" -- TIPO: "+ins.lista.get(i).getType());
+		}
+		
+		Instruction ins2 =  Instruction.getInstacia();
+		
+		for (int i = 0; i < ins2.lista.size(); i++) {
+			System.err.println("MENSAJE: "+ins2.lista.get(i).getMessage()+" -- TIPO: "+ins2.lista.get(i).getType());
 		}
 	}
 	
