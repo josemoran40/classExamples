@@ -13,5 +13,7 @@
     "src/**/*.d.ts",
     "src/app/interpreter/Expresion/**/*.ts",
     "src/app/interpreter/Error/**/*.ts",
+    "src/app/interpreter/Instruccion/**/*.ts",
+    "src/app/interpreter/Extra/**/*.ts",
   ]
 }

@@ -17,6 +17,6 @@ export const tipos = [
         Type.STRING, Type.STRING, Type.STRING
     ],
     [ //error, string, bool, error, 
-        Type.NUMBER, Type.STRING, Type.NUMBER
+        Type.NUMBER, Type.STRING, Type.BOOLEAN
     ]
 ];

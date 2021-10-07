@@ -1,6 +1,7 @@
 import { Expresion } from "./Expresion";
 import { Retorno, Type } from "./Retorno"
 import { Error_ } from "../Error/Error";
+import { Ambito } from "../Extra/Ambito";
 
 export class Aritmetica extends Expresion {
 
@@ -8,10 +9,10 @@ export class Aritmetica extends Expresion {
         super(line, column);
     }
 
-    public execute(): Retorno {
-        const leftValue = this.left.execute();
+    public execute(ambito: Ambito): Retorno {
+        const leftValue = this.left.execute(ambito);
 
-        const rightValue = this.right.execute();
+        const rightValue = this.right.execute(ambito);
 
         let dominante = this.tipoDominante(leftValue.type, rightValue.type);
 
@@ -32,7 +33,10 @@ export class Aritmetica extends Expresion {
         }
         else if (this.tipo == TipoAritmetica.MULTIPLICACION) {
             if (dominante == Type.NUMBER) {
-                return { value: (leftValue.value * rightValue.value), type: Type.NUMBER };
+                if (leftValue.type != Type.BOOLEAN || rightValue.type != Type.BOOLEAN) {
+                    return { value: (leftValue.value * rightValue.value), type: Type.NUMBER };
+                }
+                throw new Error_(this.line, this.column, 'Semantico', 'No se puede operar: ' + leftValue.type + ' _ ' + rightValue.type);
             } else {
                 throw new Error_(this.line, this.column, 'Semantico', 'No se puede operar: ' + leftValue.type + ' _ ' + rightValue.type);
             }

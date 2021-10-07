@@ -2,6 +2,9 @@
     const {Aritmetica,TipoAritmetica} = require('../Expresion/Aritmetica')
     const {Relacional,TipoRelacional} = require('../Expresion/Relacional')
     const {Literal,TipoLiteral} = require('../Expresion/Literal')
+    const {Acceso} = require('../Expresion/Acceso')
+    const {Declaracion} = require('../Instruccion/Declaracion')
+    const {Print} = require('../Instruccion/Print')
 %}
 
 %lex
@@ -18,6 +21,7 @@
 
 "true"                  return 'TRUE';
 "false"                 return 'FALSE';
+"print"                 return 'PRINT';
 
 //'dijofdjf'+${}'
 [0-9]+("."[0-9]+)?\b  	return 'ENTERO';
@@ -41,6 +45,8 @@
 "-"					    return 'MENOS';
 "*"					    return 'POR';
 "/"					    return 'DIVIDIR';
+"="                     return 'IGUAL';
+";"                     return 'PUNTO_Y_COMA';
 
 \"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
 \'[^\']*\'				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
@@ -66,10 +72,41 @@
 %% 
 
 ini
-	: expresion EOF{
+	: instrucciones EOF{
 		return $1;
 	}
 ;
+
+instrucciones
+    :instrucciones inicio 
+        { $1.push($2); $$ = $1; }
+    |inicio 
+        { $$ = [$1]; }
+;
+
+
+inicio
+    :declaracion
+    |print
+;
+
+declaracion 
+    : IDENTIFICADOR IGUAL expresion PUNTO_Y_COMA 
+        {$$ = new Declaracion($1,$3,@1.first_line, @1.first_column)}
+;
+
+print
+    :PRINT PAR_ABRE ListaExpr PAR_CIERRA PUNTO_Y_COMA 
+        {$$ = new Print($3,@1.first_line, @1.first_column)}
+;
+
+ListaExpr 
+    : ListaExpr COMA expresion
+        { $1.push($3);$$ = $1;}
+    | expresion
+        {$$ = [$1];}
+;
+
 
 //EXPRESION
 
@@ -89,5 +126,6 @@ expresion
 	|ENTERO	                            {$$= new Literal($1,TipoLiteral.NUMBER, @1.first_line, @1.first_column)}							
 	|CADENA                             {$$= new Literal($1,TipoLiteral.STRING, @1.first_line, @1.first_column)}        					
     |TRUE                               {$$= new Literal($1,TipoLiteral.BOOL, @1.first_line, @1.first_column)}                              
-    |FALSE                              {$$= new Literal($1,TipoLiteral.BOOL, @1.first_line, @1.first_column)} 
+    |FALSE                              {$$= new Literal($1,TipoLiteral.BOOL, @1.first_line, @1.first_column)}
+    |IDENTIFICADOR                      {$$= new Acceso($1, @1.first_line, @1.first_column)}
 ;
