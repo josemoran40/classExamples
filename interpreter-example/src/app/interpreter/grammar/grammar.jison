@@ -5,6 +5,10 @@
     const {Acceso} = require('../Expresion/Acceso')
     const {Declaracion} = require('../Instruccion/Declaracion')
     const {Print} = require('../Instruccion/Print')
+    const {Statement} = require('../Instruccion/Statement')
+    const {If} = require('../Instruccion/If')
+    const {While} = require('../Instruccion/While')
+    const {Break} = require('../Instruccion/Break')
 %}
 
 %lex
@@ -22,14 +26,19 @@
 "true"                  return 'TRUE';
 "false"                 return 'FALSE';
 "print"                 return 'PRINT';
+"if"                    return 'IF';
+"while"                 return 'WHILE';
+"break"                 return 'BREAK';
+"else"                  return 'ELSE';
 
-//'dijofdjf'+${}'
 [0-9]+("."[0-9]+)?\b  	return 'ENTERO';
 [0-9]+\b				return 'ENTERO';
 ([a-zA-Z])[a-zA-Z0-9_]*	return 'IDENTIFICADOR';
 
 "("                     return 'PAR_ABRE';
 ")"                     return 'PAR_CIERRA';
+"{"                     return 'LLAVE_ABRE';
+"}"                     return 'LLAVE_CIERRA';
 
 //logicos
 "=="                    return 'D_IGUAL';
@@ -88,6 +97,9 @@ instrucciones
 inicio
     :declaracion
     |print
+    |if
+    |while
+    | BREAK PUNTO_Y_COMA {$$=new Break(@1.first_line, @1.first_column)}
 ;
 
 declaracion 
@@ -98,6 +110,27 @@ declaracion
 print
     :PRINT PAR_ABRE ListaExpr PAR_CIERRA PUNTO_Y_COMA 
         {$$ = new Print($3,@1.first_line, @1.first_column)}
+;
+
+
+if 
+    :IF PAR_ABRE expresion PAR_CIERRA statement elsE {$$ = new If($3, $5, $6, @1.first_line, @1.first_column)}
+;
+
+elsE
+    :ELSE statement {$$ = $2}
+    |ELSE if {$$ = $2}
+    | {$$ = null}
+;
+
+while
+    : WHILE PAR_ABRE expresion PAR_CIERRA statement
+    { $$ = new While($3, $5,  @1.first_line, @1.first_column)}
+;
+
+statement
+    : LLAVE_ABRE instrucciones LLAVE_CIERRA { $$ = new Statement($2, @1.first_line, @1.first_column)}
+    | LLAVE_ABRE LLAVE_CIERRA {$$ = new Statement([], @1.first_line, @1.first_column)}
 ;
 
 ListaExpr 

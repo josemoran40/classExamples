@@ -14,5 +14,4 @@ export abstract class Instruccion {
     }
 
     public abstract execute(ambito: Ambito): any;
-
 }

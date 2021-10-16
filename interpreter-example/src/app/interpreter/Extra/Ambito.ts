@@ -15,8 +15,11 @@ export class Ambito {
         while (env != null) {
             if (env.variables.has(id)) {
                 const val = env.variables.get(id)
-                if (val.type == type) env.variables.set(id, new Simbolo(value, id, type))
-                throw new Error_(line, column, 'Semantico', 'No se puede asignar: ' + value + ' a ' + id)
+                if (val.type == type) {
+                    env.variables.set(id, new Simbolo(value, id, type))
+                } else {
+                    throw new Error_(line, column, 'Semantico', 'No se puede asignar: ' + value + ' a ' + id)
+                }
             }
             env = env.anterior
         }
