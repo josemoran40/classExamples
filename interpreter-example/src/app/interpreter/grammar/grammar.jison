@@ -9,6 +9,9 @@
     const {If} = require('../Instruccion/If')
     const {While} = require('../Instruccion/While')
     const {Break} = require('../Instruccion/Break')
+    const {Funcion} = require('../Instruccion/Funcion')
+    const {LlamadaFuncion} = require('../Instruccion/LlamadaFuncion')
+    const {Return} = require('../Instruccion/Return')
 %}
 
 %lex
@@ -30,6 +33,8 @@
 "while"                 return 'WHILE';
 "break"                 return 'BREAK';
 "else"                  return 'ELSE';
+"function"              return 'FUNCTION';
+"return"                return 'RETURN';
 
 [0-9]+("."[0-9]+)?\b  	return 'ENTERO';
 [0-9]+\b				return 'ENTERO';
@@ -47,6 +52,7 @@
 ">="                    return 'MAYOR_IGUAL';                     
 ">"                     return 'MAYOR';
 "!="                    return 'DIFERENTE';
+"&&"                    return 'AND';
 //*/
 
 ','                     return 'COMA'
@@ -99,6 +105,8 @@ inicio
     |print
     |if
     |while
+    |funcion
+    |llamadaFuncion PUNTO_Y_COMA
     | BREAK PUNTO_Y_COMA {$$=new Break(@1.first_line, @1.first_column)}
 ;
 
@@ -140,6 +148,30 @@ ListaExpr
         {$$ = [$1];}
 ;
 
+funcion 
+    : FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA statement 
+        {$$ = new Funcion($2, $5, [], @1.first_line, @1.first_column);}
+    | FUNCTION IDENTIFICADOR PAR_ABRE parametros PAR_CIERRA statement 
+        {$$ = new Funcion($2, $6, $4, @1.first_line, @1.first_column);}      
+;
+
+parametros
+    :parametros COMA IDENTIFICADOR
+        { $1.push($3); $$ =$1 }
+    |IDENTIFICADOR 
+        {$$ = [$1]}
+;
+
+
+
+llamadaFuncion
+    : IDENTIFICADOR PAR_ABRE PAR_CIERRA 
+        {$$ = new LlamadaFuncion($1, [], @1.first_line, @1.first_column);}
+    | IDENTIFICADOR PAR_ABRE ListaExpr PAR_CIERRA 
+        { $$ = new LlamadaFuncion($1, $3, @1.first_line, @1.first_column);}
+;
+
+
 
 //EXPRESION
 
@@ -153,8 +185,9 @@ expresion
     |expresion DIFERENTE expresion      {$$= new Relacional($1,$3,TipoRelacional.DIFERENTE, @1.first_line, @1.first_column)} 
     |expresion MAYOR_IGUAL expresion    {$$= new Relacional($1,$3,TipoRelacional.MAYOR_IGUAL, @1.first_line, @1.first_column)} 
     |expresion MENOR_IGUAL expresion    {$$= new Relacional($1,$3,TipoRelacional.MENOR_IGUAL, @1.first_line, @1.first_column)} 
-    |expresion MAYOR expresion          {$$= new Relacional($1,$3,TipoRelacional.MAYOR, @1.first_line, @1.first_column)}         
+    |expresion MAYOR expresion          {$$= new Relacional($1,$3,TipoRelacional.MAYOR, @1.first_line, @1.first_column)}       
     |expresion MENOR expresion          {$$= new Relacional($1,$3,TipoRelacional.MENOR, @1.first_line, @1.first_column)}
+    |llamadaFuncion
     |PAR_ABRE expresion PAR_CIERRA      {$$= $2}
 	|ENTERO	                            {$$= new Literal($1,TipoLiteral.NUMBER, @1.first_line, @1.first_column)}							
 	|CADENA                             {$$= new Literal($1,TipoLiteral.STRING, @1.first_line, @1.first_column)}        					

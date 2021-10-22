@@ -6,6 +6,7 @@ import * as ace from 'ace-builds'; // ace module ..
 import 'ace-builds/src-noconflict/ext-beautify';
 import 'ace-builds/src-noconflict/mode-typescript'
 import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties'; import { Ambito } from './interpreter/Extra/Ambito.js';
+import { Funcion } from './interpreter/Instruccion/Funcion.js';
 ;
 const THEME = 'ace/theme/tomorrow_night_eighties';
 const LANG = 'ace/mode/typescript';
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit {
     const element = this.codeEditorElmRef.nativeElement;
     const editorOptions: Partial<ace.Ace.EditorOptions> = {
       highlightActiveLine: false,
-      minLines: 45,
+      minLines: 20,
       maxLines: Infinity,
       maxPixelHeight: 800,
       fontSize: 20
@@ -46,10 +47,22 @@ export class AppComponent implements OnInit {
     }
     const ast = parser.parse(entrada)
     console.log(ast)
+
+
+    const ambito = new Ambito(null)
+    for (const instr of ast) {
+      try {
+        if (instr instanceof Funcion)
+          instr.execute(ambito);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+
     try {
-      const ambito = new Ambito(null)
       for (const inst of ast) {
-        inst.execute(ambito)
+        const retorno = inst.execute(ambito)
       }
     } catch (error) {
       console.log(error)
